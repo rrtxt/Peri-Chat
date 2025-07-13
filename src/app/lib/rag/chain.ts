@@ -2,7 +2,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { getRetriever } from "./retriever";
 import { Annotation, StateGraph } from "@langchain/langgraph";
 import { Document } from "langchain/document";
-import { promptTemplate } from "./prompt";
+import { gemmaPromptTemplate } from "./prompt";
 
 const llm = new ChatGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || "",
@@ -30,8 +30,8 @@ const retrievalNode = async (state: InputState) => {
 
   // Transform the document content to include metadata
   const transformedDocs = retrievedDocs.map((doc) => {
-    const name = doc.metadata["Name"] ?? "Unknown TWS";
-    const price = doc.metadata["Price Link_Toped"] ?? "N/A";
+    const name = doc.metadata["name"] ?? "Unknown TWS";
+    const price = doc.metadata["Price Link Toped"] ?? "N/A";
     const sound = doc.metadata["Overall Sound"] ?? "N/A";
     const content = `Name: ${name} \nPrice: ${price}\nSound: ${sound}\nDesc: ${doc.pageContent}`;
 
@@ -48,7 +48,7 @@ const retrievalNode = async (state: InputState) => {
 
 const generatorNode = async (state: typeof StateAnnotation.State) => {
   const docsContent = state.context.map((doc) => doc.pageContent).join("\n");
-  const messages = await promptTemplate.invoke({
+  const messages = await gemmaPromptTemplate.invoke({
     question: state.question,
     context: docsContent,
   });
