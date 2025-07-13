@@ -1,3 +1,4 @@
+"use server";
 import { graph } from "../lib/rag/chain";
 
 export async function runChat(question: string) {
@@ -5,8 +6,15 @@ export async function runChat(question: string) {
     question: question,
   });
 
+  // return {
+  //   answer:
+  //     result.answer || "Sorry, I couldn't answer this question right now.",
+  //   sources: result.context.map((doc) => doc.metadata) || [],
+  // };
+  console.log(result);
   return {
-    answer: result.answer || "Sorry, I couldn't find relevant information.",
-    sources: result.context.map((doc) => doc.metadata) || [],
+    role: "assistant" as const,
+    message:
+      result.answer || "Sorry, I couldn't answer this question right now.",
   };
 }
