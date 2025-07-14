@@ -6,7 +6,7 @@ import { gemmaPromptTemplate } from "./prompt";
 
 const llm = new ChatGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || "",
-  model: "gemma-3-4b-it",
+  model: "gemma-3-27b-it",
   temperature: 0.2,
   topK: 7,
 });
