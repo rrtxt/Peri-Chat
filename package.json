@@ -13,12 +13,14 @@
     "@langchain/core": "^0.3.62",
     "@langchain/google-genai": "^0.2.14",
     "@langchain/langgraph": "^0.3.7",
+    "@langchain/tavily": "^0.1.4",
     "@supabase/supabase-js": "^2.50.5",
     "langchain": "^0.3.29",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
+    "uuid": "^11.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
