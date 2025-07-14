@@ -3,6 +3,7 @@ import { runChat } from "@/actions/chatAction";
 import { ChatMessage } from "@/components/ChatMessage";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
+import { v4 as uuidv4 } from "uuid";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -13,6 +14,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>();
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [threadId, setThreadId] = useState<string>("");
 
   const handleAction = async () => {
     console.log("Input:", input);
@@ -28,7 +30,10 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      const assistantMessage = await runChat(input);
+      if (threadId.trim() === "") {
+        setThreadId(uuidv4());
+      }
+      const assistantMessage = await runChat(input, threadId);
       setMessages((prev) => [...(prev || []), assistantMessage]);
     } catch (error) {
       console.error("Error:", error);

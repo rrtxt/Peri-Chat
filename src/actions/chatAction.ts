@@ -1,13 +1,18 @@
 "use server";
 
-import { graph } from "@/lib/rag/chain";
+import { graphWithMemory } from "@/lib/rag/chain";
 
-export async function runChat(question: string) {
-  const result = await graph.invoke({
-    question: question,
-  });
+export async function runChat(question: string, thread_id: string | undefined) {
+  const threadConfig = {
+    configurable: { thread_id },
+  };
+  const result = await graphWithMemory.invoke(
+    {
+      question,
+    },
+    threadConfig
+  );
 
-  console.log(result);
   return {
     role: "assistant" as const,
     message:
@@ -16,7 +21,7 @@ export async function runChat(question: string) {
 }
 
 export async function streamChat(question: string) {
-  return graph.stream({
+  return graphWithMemory.stream({
     question: question,
   });
 

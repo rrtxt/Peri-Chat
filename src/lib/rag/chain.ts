@@ -1,6 +1,6 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { getRetriever } from "./retriever";
-import { Annotation, StateGraph } from "@langchain/langgraph";
+import { Annotation, MemorySaver, StateGraph } from "@langchain/langgraph";
 import { Document } from "langchain/document";
 import { gemmaPromptTemplate } from "./prompt";
 
@@ -10,10 +10,6 @@ const llm = new ChatGoogleGenerativeAI({
   temperature: 0.2,
   topK: 7,
 });
-
-// const InputStateAnnotation = Annotation.Root({
-//   question: Annotation<string>,
-// });
 
 type InputState = {
   question: string;
@@ -33,7 +29,7 @@ const retrievalNode = async (state: InputState) => {
     const name = doc.metadata["name"] ?? "Unknown TWS";
     const price = doc.metadata["Price Link Toped"] ?? "N/A";
     const sound = doc.metadata["Overall Sound"] ?? "N/A";
-    const content = `Name: ${name} \nPrice: ${price}\nSound: ${sound}\nDesc: ${doc.pageContent}`;
+    const content = `Name: ${name} \nPrice: ${price}\nSound: ${sound}\nDesc: ${doc.pageContent}\n\n`;
 
     return new Document({
       pageContent: content,
@@ -52,6 +48,7 @@ const generatorNode = async (state: typeof StateAnnotation.State) => {
     question: state.question,
     context: docsContent,
   });
+  console.log("Messages:", messages);
   const response = await llm.invoke(messages);
   return { answer: response.content };
 };
@@ -61,5 +58,7 @@ export const graph = new StateGraph(StateAnnotation)
   .addNode("generate", generatorNode)
   .addEdge("__start__", "retrieve")
   .addEdge("retrieve", "generate")
-  .addEdge("generate", "__end__")
-  .compile();
+  .addEdge("generate", "__end__");
+
+const checkpointer = new MemorySaver();
+export const graphWithMemory = graph.compile({ checkpointer });
