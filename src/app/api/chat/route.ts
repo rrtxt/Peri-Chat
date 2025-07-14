@@ -1,23 +1,30 @@
-import { graph } from "@/app/lib/rag/chain";
-import { NextApiRequest, NextApiResponse } from "next";
+import { graph } from "@/lib/rag/chain";
+import { NextRequest } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { question } = req.body;
+export async function POST(req: NextRequest) {
+  const { question } = await req.json();
 
-    const result = await graph.invoke({
-      question: question,
-    });
-    const answer =
-      result.answer || "Sorry, I couldn't find relevant information.";
-    console.log("Retrieved context:", result.context);
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const graphStream = await graph.stream({ question });
 
-    return res.status(200).json({
-      answer,
-      sources: result.context.map((doc) => doc.metadata) || [],
-    });
-  } catch (error) {
-    console.error("Error processing request:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
+      for await (const chunk of graphStream) {
+        const message = chunk.generate?.answer || "";
+        console.log(`${JSON.stringify(chunk, null, 2)}|`);
+
+        controller.enqueue(encoder.encode(message));
+      }
+
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
 }

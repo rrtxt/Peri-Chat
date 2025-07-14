@@ -16,19 +16,20 @@ export async function runChat(question: string) {
 }
 
 export async function streamChat(question: string) {
-  const result = await graph.stream({
+  return graph.stream({
     question: question,
   });
 
-  const chunks = [];
+  // const chunks = [];
 
-  for await (const chunk of result) {
-    console.log("Stream chunk:", chunk);
-    chunks.push({
-      role: "assistant" as const,
-      message: chunk.text || chunk.content || chunk.message || "",
-    });
-  }
+  // for await (const chunk of result) {
+  //   console.log(`${chunk.generate?.answer || " "}|`);
+  //   const message = chunk.generate?.answer || "";
+  //   chunks.push({
+  //     role: "assistant" as const,
+  //     message,
+  //   });
+  // }
 
-  return result;
+  // return chunks;
 }
