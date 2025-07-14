@@ -6,7 +6,7 @@ export const retriever = vectorStore.asRetriever({
 });
 
 export const getRetriever = (filters?: Record<string, string>) => {
-  const allowedFilters = ["Price Link_Toped", "Overall Sound"];
+  const allowedFilters = ["name", "Price Link_Toped", "Overall Sound"];
   const sanitizedFilters = Object.fromEntries(
     Object.entries(filters || {}).filter(([key]) =>
       allowedFilters.includes(key)
