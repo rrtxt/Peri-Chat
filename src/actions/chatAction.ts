@@ -1,5 +1,6 @@
 "use server";
-import { graph } from "../lib/rag/chain";
+
+import { graph } from "@/lib/rag/chain";
 
 export async function runChat(question: string) {
   const result = await graph.invoke({
