@@ -52,9 +52,9 @@ const retrievalNode = async (state: InputState) => {
   // Transform the document content to include metadata
   const transformedDocs = retrievedDocs.map((doc) => {
     const name = doc.metadata["name"] ?? "Unknown TWS";
-    const price = doc.metadata["Price Link Toped"] ?? "N/A";
-    const sound = doc.metadata["Overall Sound"] ?? "N/A";
-    const content = `Name: ${name} \nPrice: ${price}\nSound: ${sound}\nDesc: ${doc.pageContent}\n\n`;
+    const price = doc.metadata["price"] ?? "N/A";
+    // const sound = doc.metadata["Overall Sound"] ?? "N/A";
+    const content = `Name: ${name} \nPrice: ${price}\nDesc: ${doc.pageContent}\n\n`;
 
     return new Document({
       pageContent: content,
@@ -154,6 +154,7 @@ const toolNode = async (state: typeof StateAnnotation.State) => {
   } finally {
     const existingContext = state.context || [];
     const updatedContext = [...existingContext, context];
+    console.log("Tool context : ", context);
 
     return { context: updatedContext };
   }
