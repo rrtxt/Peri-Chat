@@ -26,11 +26,6 @@ const tools_schema_str = tools_schema
   )
   .join("\n\n");
 
-console.log(
-  "Expected Schema: ",
-  generateToolSchema(tavilySearchTool).parameters
-);
-
 const tool_registry = Object.fromEntries(
   tools.map((tool) => [tool.name, (args: any) => tool.invoke(args)])
 );
@@ -134,8 +129,10 @@ const toolNode = async (state: typeof StateAnnotation.State) => {
     const result = await tool_registry[tool.name](cleanParams);
 
     // Convert result to context documents for further processing
+    const content =
+      typeof result === "string" ? result : JSON.stringify(result);
     context = new Document({
-      pageContent: result,
+      pageContent: content,
       metadata: { source: tool.name, tool_call: true },
     });
   } catch (error) {
@@ -166,7 +163,7 @@ const generatorNode = async (state: typeof StateAnnotation.State) => {
     question: state.question,
     context: docsContent,
   });
-  // console.log("Messages:", messages);
+  console.log("Messages:", messages);
   const response = await llm.invoke(messages);
   return { answer: response.content };
 };
